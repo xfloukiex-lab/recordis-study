@@ -14,10 +14,10 @@ Papers of record: [Comparing Processes as Curves of Distributions (underlying di
 
 | Status | Count | Meaning |
 |---|---:|---|
-| Active | 4 | Survives the controls it was tested against. |
+| Active | 5 | Survives the controls it was tested against. |
 | Negative | 3 | Tested and did not hold. |
 | Retracted | 1 | Subsequently refuted by our own measurement; original wording retained. |
-| **Total** | **8** | |
+| **Total** | **9** | |
 
 **3 negative results and 1 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
 
@@ -55,6 +55,8 @@ Findings 1 and 3 are negative results.
 
 ### Active
 
+- **[9] The failures are physiological, not algorithmic: in those patients the non-AF rhythm is itself irregular** — rung 3, 2026-08-05  
+  The patients on which classification fails are those whose two rhythm states do not differ in beat-to-beat variability. Median RMSSD for the non-AF and AF states, and their ratio, across the three lowest- and three highest-scoring patients of finding 7: patient 103, 282 ms non-AF against 109 ms AF (ratio 0.39, score 0.510); patient 11, 240 against 213 (0.89, 0.440); patient 10, 132 against 165 (1.25, 0.560); patient 110, 64 against 186 (2.89, 0.990); patient 00, 15 against 95 (6.50, 1.000); patient 102, 13 against 166 (12.42, 1.000). Every patient with a ratio above 2.8 scored at or above 0.990, and every patient below 1.3 scored at or below 0.560, with no overlap between the groups.
 - **[8] Diagnosis of the worst-performing patient: the representation does not separate that patient's two rhythms** — rung 3, 2026-08-05  
   For the patient scoring lowest in finding 7, the representation does not distinguish the two rhythm states at all. Mean distance between windows of opposite class is SMALLER than between windows of the same class (22.64 against 23.34, separation −0.70). A classifier retrieving by that distance is therefore reading noise for this patient, and its output is not merely unreliable but uninformative. Two candidate explanations are excluded: the store and query sets were class-balanced by construction, and accuracy differs little between queries near and far in time from their nearest stored window (0.380 against 0.320), so neither class imbalance nor within-recording drift accounts for it.
 - **[5] Continuous recording with no exclusions: 0.966 accuracy; AF onset detected in the first window of every episode** — rung 3, 2026-08-05  
