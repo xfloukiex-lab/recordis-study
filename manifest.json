@@ -1,0 +1,135 @@
+{
+  "project": "Recordis",
+  "subtitle": "Per-patient cardiac rhythm classification from remembered episodes — study record",
+  "one_line": "Atrial fibrillation is classified against a store of the individual patient's own labelled rhythm episodes, with each classification traceable to the episodes that produced it.",
+  "byline": "Alexander Parnell · Vektorgeist · vektorgeist.com/research",
+  "study_url": "https://xfloukiex-lab.github.io/recordis-study/",
+  "papers": [
+    {"title": "Comparing Processes as Curves of Distributions (underlying distance)", "doi": "10.5281/zenodo.21612829"},
+    {"title": "Learning Without Weights (learning method)", "doi": "10.5281/zenodo.21612831"}
+  ],
+  "private": false,
+  "private_note": "Working study record. Negative results and criteria that failed as written are retained. Not indexed.",
+  "status_meanings": {
+    "active": "Survives the controls it was tested against.",
+    "provisional": "Measured on one task or at small scale; not replicated.",
+    "negative": "Tested and did not hold.",
+    "retracted": "Subsequently refuted by our own measurement; original wording retained."
+  },
+  "rungs": {
+    "1": "reasoned, unmeasured",
+    "2": "measured once, synthetic data",
+    "3": "measured on real patient data, single database",
+    "4": "replicated on a second, independent patient database",
+    "5": "prospective — data recorded after the method was fixed",
+    "6": "head-to-head against a deployed clinical device on the same recordings",
+    "7": "independently reproduced outside this project"
+  },
+  "findings": [
+    {
+      "id": 1,
+      "date": "2026-08-05",
+      "title": "Single-beat morphology: classification does not reach the pre-registered threshold",
+      "status": "negative",
+      "rung": 3,
+      "claim": "Classification of individual heartbeats by waveform morphology (five rhythm classes, single patient, ECG5000) did not meet its pre-registered criteria. Recognition accuracy increased with the number of stored examples (0.370, 0.428, 0.517, 0.517 for stores of 1, 2, 4 and 8 examples per class; chance 0.200) but plateaued at approximately half the 0.85 threshold. Reconstruction accuracy did not increase across the same range (0.407, 0.450, 0.417, 0.467).",
+      "evidence": "Three seeds per coverage level. Store, query and reference sets were beat-disjoint. Classification used a nearest-neighbour reference set with no averaged prototypes. Protocol and thresholds were identical to those used for the non-clinical validation of the same method. Both decision rules (weighted vote and class prototype) tracked within 0.03 at every level.",
+      "scope": "Single public database, single patient, single representation. Applies to beat morphology only; rhythm-level classification is addressed in finding 2.",
+      "code": "validate/coverage_law_ecg.py",
+      "controls": [
+        "pre-registered thresholds frozen before execution, identical to those used in the method's non-clinical validation",
+        "chance floor reported alongside accuracy",
+        "both decision rules reported at every coverage level"
+      ],
+      "note": "The underlying distance compares processes by their temporal evolution. The identity of an isolated heartbeat is carried predominantly by waveform shape rather than by evolution over time, which is consistent with the observed null. This delimits the applicable question type for the method in cardiac signals."
+    },
+    {
+      "id": 2,
+      "date": "2026-08-05",
+      "title": "Rhythm-level classification: per-patient AF detection reaches 0.935 at 16 stored windows per state",
+      "status": "active",
+      "rung": 3,
+      "claim": "Classification of atrial fibrillation from inter-beat interval dynamics, against the same patient's own non-AF rhythm, reached 0.935 accuracy at 16 stored windows per state (chance 0.500). Reconstruction accuracy was 0.89–0.92 at every coverage level tested, in contrast to finding 1 where it did not increase.",
+      "evidence": "Ten patients from the MIT-BIH Atrial Fibrillation Database, each recording containing both AF and non-AF periods for that patient, permitting a within-patient store. Windows of 64 intervals; store, reference and query sets window-disjoint; 60 queries per patient. The information-geometric distance exceeded a Euclidean control on identical windows at all four coverage levels (+3.0, +5.5, +4.3, +3.7 points).",
+      "scope": "Within-patient classification only. Cross-patient generalisation was not tested. Windows spanning a rhythm transition were excluded at this stage; finding 5 removes that exclusion. Two classes, chance 0.500, single seed.",
+      "code": "validate/coverage_law_afib.py",
+      "controls": [
+        "Euclidean control computed on identical windows and splits, isolating the distance from the representation and retrieval procedure",
+        "windows with mixed labels excluded rather than assigned, an exclusion subsequently tested in finding 5",
+        "reference set consists of held-out windows from the same patient, with no averaged prototypes in the evaluator"
+      ],
+      "note": "Two pre-registered criteria failed as written and are retained: one required strictly monotonic improvement, against which a 0.7-point decrease occurred between the first two coverage levels; the other required a 5-point margin over the Euclidean control at the highest coverage level, where the observed margin was 3.7 points. Findings 1 and 2 differ only in the physiological question posed of the same patients, method and representation family."
+    },
+    {
+      "id": 3,
+      "date": "2026-08-05",
+      "title": "Comparison to published detectors, and to a population reference store, at equal store size",
+      "status": "negative",
+      "rung": 3,
+      "claim": "Neither pre-registered comparison was met. Published interval-based AF detectors report 95–98% accuracy on this database; the untuned method reached 93.5%. With store size held equal, a store composed of the patient's own windows exceeded a store composed of other patients' windows by 2.7 points accuracy and 3.7 points specificity across ten patients, against 10-point thresholds.",
+      "evidence": "Sixteen windows per class in both arms, with identical queries and splits per patient, isolating store composition from store size. Mean differences: accuracy +0.027, specificity +0.037, sensitivity −0.003. Four of ten patients showed no difference, the population store having reached 1.000 on them; three showed small negative differences. Published figures are taken from the literature on the same database and were not re-measured.",
+      "scope": "Single database, single window length, single representation, single seed. The accuracy comparison is superseded by finding 4; the store-composition comparison stands.",
+      "code": "validate/afib_personal_vs_population.py",
+      "controls": [
+        "equal store size in both arms, without which store composition and store size are confounded",
+        "population store balanced by class and drawn from all other patients",
+        "specificity reported separately from accuracy, since the documented limitation of deployed monitors is false-positive burden"
+      ],
+      "note": "Post-hoc and not pre-registered: the difference between store compositions was not uniform across patients. It correlated negatively with population-store performance (r = −0.86 accuracy, r = −0.87 specificity). For the three patients where the population store performed below 0.90, mean differences were +0.100 accuracy and +0.189 specificity; in the weakest case specificity increased from 0.387 to 0.871. This is a hypothesis requiring a pre-registered test on held-out patients and is not claimed here."
+    },
+    {
+      "id": 4,
+      "date": "2026-08-05",
+      "title": "Accuracy is limited by store size, not by hyperparameters: 0.983 at 64 stored windows per state",
+      "status": "active",
+      "rung": 3,
+      "claim": "Two experiments locate the source of the deficit reported in finding 3. A hyperparameter sweep over window length, sub-window length and bin count, tuned on five patients and evaluated on five patients excluded from the sweep, produced no change in held-out accuracy (0.940 for both the sweep-selected and default configurations, while development-set accuracy rose from 0.925 to 0.945). Increasing store size produced 0.935, 0.967 and 0.983 accuracy at 16, 32 and 64 windows per state respectively, still increasing, with the Euclidean control lower at every level.",
+      "evidence": "Coverage extension across nine patients, 40 queries each, within-patient stores. Eleven configurations were evaluated on the development set; the verdict was measured only on patients excluded from tuning. Sixty-four windows per state corresponds to approximately one hour of that patient's labelled rhythm.",
+      "scope": "This measurement excludes windows spanning a rhythm transition; finding 5 removes that exclusion and reports the figure appropriate for comparison. Within-patient only, single database, single seed.",
+      "code": "validate/afib_tune_holdout.py",
+      "controls": [
+        "tuning evaluated only on patients excluded from the sweep, which identified the development-set gain as overfitting",
+        "Euclidean control carried at every coverage level, so the increase is not attributable to store size alone",
+        "default configuration retained as a comparison arm"
+      ],
+      "note": "The published comparison in finding 3 was between tuned detectors trained on substantially more data and an untuned method given 16 examples per state. Accuracy increasing monotonically with stored examples, without any retraining step, is the behaviour predicted for a memory-based classifier."
+    },
+    {
+      "id": 5,
+      "date": "2026-08-05",
+      "title": "Continuous recording with no exclusions: 0.966 accuracy; AF onset detected in the first window of every episode",
+      "status": "active",
+      "rung": 3,
+      "claim": "Findings 2 and 4 excluded windows spanning a rhythm transition, which are the windows containing episode onset and offset. Scoring every window with no exclusions, mixed windows assigned by majority class, accuracy was 0.966 across nine patients. Transition windows were classified less accurately than pure windows (0.902 against 0.969) without moving the overall figure outside the published range. In 14 AF episodes of at least three windows, the first AF classification occurred in the first window of the episode in every case (median lag 0 windows, 90th percentile 0).",
+      "evidence": "Within-patient stores of 64 pure windows per state; queries comprise the remainder of that patient's recording in recording order with no filtering, to 150 windows per patient. Per-patient accuracy ranged from 0.873 to 1.000; the lowest-scoring patient contained the largest proportion of transition windows (28 of 150).",
+      "scope": "Within-patient only; cross-patient generalisation not tested. Single database, single seed, single window length, majority-label assignment for mixed windows. Published detectors differ in episode-level scoring convention, so this is a comparison under a comparable rather than identical protocol and supports a claim of comparable performance only. Fourteen episodes is a small sample for the onset result.",
+      "code": "validate/afib_transitions.py",
+      "controls": [
+        "no exclusions applied, removing the exclusion that limited comparability of findings 2 and 4",
+        "transition and pure windows scored separately as well as jointly",
+        "queries evaluated in recording order rather than shuffled"
+      ],
+      "note": "Not yet measured: generalisation to a patient absent from the store, recording durations beyond those in this database, episodes shorter than three windows, and any comparison against a deployed clinical device."
+    }
+  ],
+  "equations": {
+    "lede": "No new mathematics is introduced by this record. The distance, the alignment and the geodesic operators are defined in the companion papers. The representation below is the only component specific to the cardiac application.",
+    "notation": "A window of heartbeats is expressed as a sequence of inter-beat intervals. Consecutive differences are binned into a magnitude-weighted distribution per sub-window, producing a curve of distributions over the window.",
+    "items": [
+      {
+        "n": 1,
+        "title": "Rhythm representation",
+        "tag": "APPLICATION-SPECIFIC — representation choice, not new mathematics",
+        "formula": "window → Δ(interval) → magnitude-weighted histogram per sub-window → curve of distributions",
+        "plain": "Beat-to-beat change in interval length is summarised as a distribution over short spans; the sequence of those distributions represents the rhythm.",
+        "provenance": "The comparison operating on this representation is defined in the companion papers and cited there. Specific to this record is the physiological quantity supplied to it: beat-to-beat change rather than waveform morphology, on the grounds that irregularity over time distinguishes the rhythms under classification. Findings 1 and 2 are the measured consequences of the two alternatives."
+      }
+    ],
+    "summary": "This record contributes no mathematics. It reports which physiological question the existing method is asked, the consequence of asking the alternative, and the behaviour of the resulting classifier under protocols relevant to clinical evaluation."
+  },
+  "method_notes": [
+    "Criteria are recorded before each experiment is executed. Where a criterion subsequently failed, the failure is reported and the criterion is not amended; findings 2, 3 and 4 each carry criteria that failed as written.",
+    "Every reported figure is produced by a released script named in the finding that reports it.",
+    "Negative results are reported with the same prominence as positive results. Findings 1 and 3 are negative."
+  ]
+}
