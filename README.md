@@ -14,10 +14,10 @@ Papers of record: [Comparing Processes as Curves of Distributions (underlying di
 
 | Status | Count | Meaning |
 |---|---:|---|
-| Active | 5 | Survives the controls it was tested against. |
+| Active | 6 | Survives the controls it was tested against. |
 | Negative | 4 | Tested and did not hold. |
 | Retracted | 1 | Subsequently refuted by our own measurement; original wording retained. |
-| **Total** | **11** | |
+| **Total** | **12** | |
 
 **4 negative results and 1 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
 
@@ -33,7 +33,7 @@ Papers of record: [Comparing Processes as Curves of Distributions (underlying di
 | 6 | head-to-head against a deployed clinical device on the same recordings |
 | 7 | independently reproduced outside this project |
 
-**Highest rung reached: 3. Nothing is at rung 7** — reproduced independently, outside this project. That is the gap, and it is the reason this is public.
+**Highest rung reached: 4. Nothing is at rung 7** — reproduced independently, outside this project. That is the gap, and it is the reason this is public.
 
 ## The equations
 
@@ -55,6 +55,8 @@ Findings 1 and 3 are negative results.
 
 ### Active
 
+- **[12] Adding an interval channel to the representation raises accuracy on both databases, but not on the patient it was built for** `[clinical-rhythm]` — rung 4, 2026-08-05  
+  The representation was extended so that each frame carries two panels of equal mass: the existing distribution over successive interval DIFFERENCES, and a new distribution over the absolute intervals themselves, which the previous representation could not observe. On the second database mean balanced accuracy rises from 0.820 to 0.875; on the first it rises from 0.966 to 0.987. The two patients finding 9 identified as having states that do not differ gain the most: patient 10 rises 0.560 to 0.780 and patient 11 rises 0.440 to 0.590. Patient 103 does not recover: 0.510 to 0.540, with non-AF recall moving only from 0.040 to 0.100 while AF recall stays at 0.980.
 - **[11] The information is present and the method discards it: a single-number detector separates the patient the method classifies at chance** `[clinical-rhythm]` — rung 3, 2026-08-05  
   On patient 103, which finding 7 classified at 0.510 balanced accuracy and finding 9 attributed to an absence of separable signal, single-number detectors computed from beat timing alone separate the two rhythm states almost completely. Threshold-free AUC over that patient's pure-label windows: mean interval 0.026, RMSSD 0.070, median absolute successive difference 0.089 — all far from chance in the inverted direction, corresponding to separability of approximately 0.97, 0.93 and 0.91. The method, given the same windows and 64 stored examples of each of that patient's own states, assigns 96 percent of its non-AF windows to AF. Patients 10 and 11 also carry above-chance per-window information, with best absolute deviations from chance of 0.256 and 0.170, so the claim of absent signal does not hold for them either, though the margin is much smaller.
 - **[8] Diagnosis of the worst-performing patient: the representation does not separate that patient's two rhythms** — rung 3, 2026-08-05  

@@ -105,15 +105,20 @@ def main():
             if not f.get("scope"):
                 problems.append(f"[{fid}] {f['status']} with no scope/limits stated")
 
-        # 7. rung 4 SPECIFICALLY claims replication on a second modality. The rungs are NOT a
-        #    strict hierarchy -- 5 is "survives a fair control" and 6 is "vs a published method",
-        #    which are different axes -- so this must not fire for >=4.
+        # 7. rung 4 in THIS record means "replicated on a second, independent patient database"
+        #    (see manifest rungs), so the text must name a second database.
+        #    ⚠ INHERITED DEFECT, FIXED 2026-08-05: this rule arrived with the builder copied from
+        #    the foundation record, where rung 4 meant a second MODALITY, and it looked for
+        #    "handwrit / modalit / speech / pen / chars". Those words cannot appear in a clinical
+        #    record, so the rule could only ever pass by accident on the words "both" or "second".
+        #    Same class as the method/thesis tabs that arrived with that copy: copying a builder
+        #    means replacing its assumptions, not only its manifest.
         if f.get("rung") == 4 and f["status"] in ("active", "provisional"):
-            blob = (f.get("evidence", "") + f.get("scope", "") + f.get("note", "")).lower()
-            if not any(w in blob for w in ("handwrit", "modalit", "speech", "pen", "chars",
-                                           "both", "second")):
-                warnings.append(f"[{fid}] rung {f['rung']} implies replication on a second "
-                                f"modality, but neither is named in the text")
+            blob = (f.get("evidence", "") + f.get("scope", "") + f.get("note", "")
+                    + f.get("claim", "")).lower()
+            if not any(w in blob for w in ("database", "ltafdb", "afdb", "second", "both")):
+                warnings.append(f"[{fid}] rung {f['rung']} means replication on a second, "
+                                f"independent patient database, but none is named in the text")
 
     # 8. is the built site stale?
     site = HERE / "docs" / "index.html"
