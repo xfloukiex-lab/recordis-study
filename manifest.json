@@ -14,6 +14,7 @@
     "active": "Survives the controls it was tested against.",
     "provisional": "Measured on one task or at small scale; not replicated.",
     "negative": "Tested and did not hold.",
+    "corrected": "The measurement stands; a conclusion drawn from it was over-extended and has been narrowed or withdrawn by later measurement. Original wording retained.",
     "retracted": "Subsequently refuted by our own measurement; original wording retained."
   },
   "rungs": {
@@ -169,8 +170,9 @@
       "id": 9,
       "date": "2026-08-05",
       "title": "The failures are physiological, not algorithmic: in those patients the non-AF rhythm is itself irregular",
-      "status": "active",
+      "status": "corrected",
       "rung": 3,
+      "correction": "The measurement below stands; the conclusion drawn from it in the note does not, and the note has been rewritten. The claim that no detector operating on beat timing alone could separate these patients was never tested against a detector. It has now been tested against the simplest one that exists — a single number per window, thresholded — and it fails for every patient it was asserted about. For patient 103 the mean interval separates the two states at AUC 0.026 and RMSSD at 0.070, both far from chance in the inverted direction, meaning approximately 0.97 and 0.93 separability, while the method scores 0.510 on the same windows and assigns 96 percent of that patient's own non-AF rhythm to AF. Patients 10 and 11 also carry per-window information above chance (best absolute deviation from chance 0.256 and 0.170). The information these patients' recordings contain is therefore not absent; on patient 103 it is abundant, and the failure is the method's. The original wording is retained in finding 11, which reports the measurements that produced this correction. What survives here is the RMSSD table itself and the observation that per-class variability ratio tracks performance across these six patients.",
       "claim": "The patients on which classification fails are those whose two rhythm states do not differ in beat-to-beat variability. Median RMSSD for the non-AF and AF states, and their ratio, across the three lowest- and three highest-scoring patients of finding 7: patient 103, 282 ms non-AF against 109 ms AF (ratio 0.39, score 0.510); patient 11, 240 against 213 (0.89, 0.440); patient 10, 132 against 165 (1.25, 0.560); patient 110, 64 against 186 (2.89, 0.990); patient 00, 15 against 95 (6.50, 1.000); patient 102, 13 against 166 (12.42, 1.000). Every patient with a ratio above 2.8 scored at or above 0.990, and every patient below 1.3 scored at or below 0.560, with no overlap between the groups.",
       "evidence": "RMSSD computed on pure-label windows of 64 intervals, reported as the median across windows of each class per patient. Normal sinus rhythm typically presents RMSSD in the range of tens of milliseconds; values of 240 and 282 ms in the non-AF state indicate a markedly irregular non-AF rhythm, consistent with frequent ectopy or an atypical supraventricular rhythm. Patient 103's AF at 109 ms is comparatively regular, consistent with a controlled ventricular response.",
       "scope": "Six patients from one database, selected as the three lowest and three highest scorers, so the separation of the two groups is not an independent test of the threshold. The clinical interpretations of the underlying rhythms are inferences from interval statistics, not annotated diagnoses. Whether the ratio predicts performance on unselected patients is untested.",
@@ -180,7 +182,47 @@
         "median across windows rather than a whole-recording figure, so a short unrepresentative segment cannot dominate",
         "rate reported alongside variability, since a rate difference could otherwise be mistaken for a variability difference"
       ],
-      "note": "This reframes findings 7 and 8. The classifier is not misreading these recordings: for these patients the quantity it measures genuinely does not differ between the two states, and no detector operating on beat timing alone — including the published comparators in finding 3 — could separate them either. The practical consequence is that the failure is detectable in advance: the ratio can be computed at enrolment, before any classification is issued, and a patient whose states do not differ in variability can be identified as one the method cannot serve. That is preferable to returning a confident classification at chance level. The threshold suggested by these six patients has not been validated on unselected patients and no specific value is proposed."
+      "note": "Rewritten 2026-08-05 following the correction above; the original note is quoted in finding 11. What holds: the per-class variability ratio tracks performance across these six patients, and it is computable at enrolment, before any classification is issued, which makes it a candidate screening statistic for identifying patients this method serves poorly. What does not hold: that the recordings themselves lack the information. They do not. The ratio predicts where THIS method fails, not where the signal is absent, and it remains unvalidated on unselected patients with no specific threshold proposed."
+    },
+    {
+      "id": 10,
+      "date": "2026-08-05",
+      "title": "The representation's fixed bins are not the cause: per-patient adaptive binning does not rescue the failing patients",
+      "status": "negative",
+      "rung": 3,
+      "track": "clinical-rhythm",
+      "claim": "The hypothesis that the failures of finding 7 are caused by the encoder — which clips successive interval differences at plus or minus 0.4 seconds and bins them with edges fixed across all patients, so that a highly variable patient could saturate the outermost bins and have both states encode alike — is refuted. Across 12 patients, balanced accuracy is 0.820 with the fixed encoder, 0.825 with equal-width bins set to the patient's own 99th percentile, and 0.830 with equal-mass bins at the patient's own quantiles. Patient 103, the patient the hypothesis was constructed to explain, is unchanged: 0.510 fixed, 0.510 scaled, 0.530 quantile.",
+      "evidence": "Bin edges were fitted on each patient's store windows only, never on query windows. The fixed-bin condition was re-run inside the same script rather than compared against previously reported numbers, and reproduced the published per-patient figures of finding 7 exactly, including the 0.820 mean. Separately, the degree of saturation does not predict performance: across the same patients, balanced accuracy against worst-class clipping fraction gives r = -0.364 and against outermost-bin weight r = -0.040. What does correlate is whether the two classes differ in the encoder's output at all, at r = +0.631. Three pre-registered criteria were declared before running and all passed, but they are reported here as weak rather than as support: the rescue criterion's +0.057 is carried almost entirely by one patient, 01, at +0.140, and the criterion that the non-saturating failures should not move passed on a group mean of -0.050 whose two members moved in opposite directions, -0.170 and +0.070.",
+      "scope": "Twelve patients, one database, single seed, within-patient. Two adaptive schemes tested; others exist. A per-patient encoder remains defensible on other grounds — it helped patient 01 substantially — but it does not explain or repair the failures this record has reported.",
+      "code": "validate/encoder_saturation.py, validate/adaptive_encoder_test.py",
+      "result_file": "validate/adaptive_encoder_test_result.json",
+      "controls": [
+        "the fixed-bin baseline was recomputed in the same run rather than carried over, so an implementation difference could not masquerade as an improvement",
+        "encoder parameters fitted on store windows only, since fitting them on the queried windows would leak the answer into the representation",
+        "criteria written into the script before any result existed, including the criterion that would have falsified the hypothesis"
+      ],
+      "note": "This was our own hypothesis, proposed before it was tested and refuted by the test. It is recorded because the alternative — quietly dropping a hypothesis that failed — would leave the impression that the encoder question is open when it has been answered."
+    },
+    {
+      "id": 11,
+      "date": "2026-08-05",
+      "title": "The information is present and the method discards it: a single-number detector separates the patient the method classifies at chance",
+      "status": "active",
+      "rung": 3,
+      "track": "clinical-rhythm",
+      "supersedes": 9,
+      "claim": "On patient 103, which finding 7 classified at 0.510 balanced accuracy and finding 9 attributed to an absence of separable signal, single-number detectors computed from beat timing alone separate the two rhythm states almost completely. Threshold-free AUC over that patient's pure-label windows: mean interval 0.026, RMSSD 0.070, median absolute successive difference 0.089 — all far from chance in the inverted direction, corresponding to separability of approximately 0.97, 0.93 and 0.91. The method, given the same windows and 64 stored examples of each of that patient's own states, assigns 96 percent of its non-AF windows to AF. Patients 10 and 11 also carry above-chance per-window information, with best absolute deviations from chance of 0.256 and 0.170, so the claim of absent signal does not hold for them either, though the margin is much smaller.",
+      "evidence": "Two further explanations were tested and eliminated before this one. Per-patient adaptive binning does not change patient 103's result (finding 10). Retrieval geometry is measurably skewed — AF stored windows occupy 86.8 percent of the nearest-neighbour slots returned to that patient's non-AF queries, against 50 percent for its balanced 64-plus-64 store — but correcting it does not help: hubness-corrected local scaling gives 0.520 and a per-class nearest-mean rule 0.510, against 0.510 for the current distance-weighted vote. One property of the representation is established by construction rather than by measurement: it is computed from successive differences only, so absolute rate is not among its inputs, and rate is the single most discriminative feature for this patient. Why the variability information, which the representation does encode, is also unused is not yet established.",
+      "scope": "One patient for the strong result, three for the weaker one, one database, within-patient. The AUC figures are threshold-free but computed on the same windows they describe, so they are optimistically biased as performance figures and are not a competing method: they are used only to refute an impossibility claim, never to support a performance claim. No fix is proposed or tested here.",
+      "code": "validate/hubness_decider_test.py, validate/simplest_detector_test.py",
+      "result_file": "validate/simplest_detector_test_result.json",
+      "controls": [
+        "AUC is rank-based with tie correction and fits no threshold, so the separability figure cannot come from a threshold chosen to flatter it",
+        "three features reported rather than the best one alone, including mean rate, which the record had previously named as a possible confound for a variability difference",
+        "the two competing explanations were each given a pre-registered criterion that could have carried them, and the hubness criterion for a real skew passed while the criterion that correcting it would help failed",
+        "the strong result is stated in the inverted direction it was measured in, rather than reported as a magnitude that would hide the inversion"
+      ],
+      "note": "This corrects finding 9, whose original conclusion read: \"The classifier is not misreading these recordings: for these patients the quantity it measures genuinely does not differ between the two states, and no detector operating on beat timing alone — including the published comparators in finding 3 — could separate them either.\" That sentence was reasoning, not measurement; no detector was run when it was written. The measurement, run afterwards, contradicts it. Finding 9's RMSSD table stands and its screening suggestion stands in weakened form — the ratio predicts where this method fails, not where the signal is absent. The practical consequence is the opposite of the original one: for a patient such as 103 the correct response is not to declare the patient unservable but to fix the method, and until that is done a false-alarm rate of this size on a patient's own normal rhythm is the failure mode that matters most clinically."
     }
   ],
   "equations": {

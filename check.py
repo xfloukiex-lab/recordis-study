@@ -25,7 +25,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 
-VALID_STATUS = {"active", "provisional", "negative", "retracted", "untested"}
+VALID_STATUS = {"active", "provisional", "corrected", "negative", "retracted", "untested"}
 
 
 def main():
@@ -87,6 +87,16 @@ def main():
             if "ORIGINAL WORDING" not in f.get("claim", ""):
                 warnings.append(f"[{fid}] retracted but the claim is not flagged as the original "
                                 f"(the wrong wording should stay visible and labelled)")
+
+        # 3b. a correction must say WHAT did not hold, and must point at the measurement that
+        #     established it — otherwise a narrowed claim reads as if it were never challenged.
+        if f["status"] == "corrected":
+            if not f.get("correction"):
+                problems.append(f"[{fid}] corrected with no explanation of what did not hold")
+            elif not any(str(o["id"]) in f["correction"] or f.get("id") in _targets(o.get("supersedes"))
+                         for o in fs if o["id"] != fid):
+                warnings.append(f"[{fid}] corrected but no other finding is named as the "
+                                f"measurement that corrected it")
 
         # 4. live claims need evidence and scope
         if f["status"] in ("active", "provisional"):

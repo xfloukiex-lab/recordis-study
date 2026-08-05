@@ -20,8 +20,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 
-STATUS_ORDER = ["active", "provisional", "negative", "retracted", "untested"]
-STATUS_CLASS = {"active": "ok", "provisional": "prov", "negative": "neg",
+STATUS_ORDER = ["active", "provisional", "corrected", "negative", "retracted", "untested"]
+STATUS_CLASS = {"active": "ok", "provisional": "prov", "corrected": "prov", "negative": "neg",
                 "retracted": "ret", "untested": "unt"}
 
 CSS = """
@@ -156,6 +156,9 @@ def finding_card(f, rungs):
     if f.get("retraction"):
         parts.append(f'<div class="retr"><p class="lab">Why this was wrong</p>'
                      f'<p>{e(f["retraction"])}</p></div>')
+    if f.get("correction"):
+        parts.append(f'<div class="retr"><p class="lab">Corrected — the part that did not hold</p>'
+                     f'<p>{e(f["correction"])}</p></div>')
     if f.get("note"):
         parts.append(f'<div class="note">{e(f["note"])}</div>')
 
