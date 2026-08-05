@@ -109,7 +109,24 @@
         "transition and pure windows scored separately as well as jointly",
         "queries evaluated in recording order rather than shuffled"
       ],
-      "note": "Not yet measured: generalisation to a patient absent from the store, recording durations beyond those in this database, episodes shorter than three windows, and any comparison against a deployed clinical device."
+      "note": "Not yet measured: generalisation to a patient absent from the store, recording durations beyond those in this database, episodes shorter than three windows, and any comparison against a deployed clinical device. Replication on a second database is reported in finding 6."
+    },
+    {
+      "id": 6,
+      "date": "2026-08-05",
+      "title": "Replication on an independent database: holds for 11 of 12 patients, fails below chance for one",
+      "status": "negative",
+      "rung": 4,
+      "claim": "The finding 5 protocol was repeated without modification on the Long Term AF Database — different patients, different recordings, longer durations, 128 Hz rather than 250 Hz. Mean accuracy across 12 patients was 0.893, below the pre-registered replication threshold of 0.90, and the criterion is recorded as failed. The mean is not representative of the distribution: 11 of the 12 patients scored between 0.660 and 1.000 with a mean of 0.942, and a single patient scored 0.350 — below the 0.500 chance level for a two-class problem, indicating a systematic rather than random failure for that recording. Onset latency replicated without qualification: median 0 windows across the episodes measured.",
+      "evidence": "Per-patient accuracy: 1.000, 1.000, 1.000, 1.000, 0.990, 0.990, 0.970, 0.900, 0.850, 0.660, 0.350 and 1.000. Up to 100 windows per patient in recording order with no exclusions, stores of 64 pure windows per state, and the representation, window length, store size and decision rule fixed on the first database with no adjustment for this one. Transition windows were classified at 0.931 against 0.893 for pure windows, the reverse of the ordering observed on the first database.",
+      "scope": "Twelve patients from one additional database; the database contains 84 records, so this is a subset and not the full set. Within-patient only. The below-chance patient has not yet been diagnosed, so whether it reflects a data property, a labelling property, or a failure mode of the method is unknown.",
+      "code": "validate/afib_replication_ltafdb.py",
+      "controls": [
+        "no parameter was adjusted for the second database — a replication that permits retuning tests the tuner rather than the method",
+        "the replication threshold was set below the original result before running, since a replication that only counts on an exact match is not a replication test",
+        "per-patient accuracy reported in full rather than as a mean, which is what makes the single failure visible"
+      ],
+      "note": "A below-chance result on a two-class problem is more informative than a merely poor one: it indicates the classifier is systematically inverted for that recording rather than uninformed. Identifying its cause is the next measurement, and until it is identified the possibility that the same failure mode is present and undetected in other patients cannot be excluded. The pre-registered criterion failed and is recorded as failed; reporting the 11-patient mean of 0.942 as the result would be selecting the sample after seeing it."
     }
   ],
   "equations": {

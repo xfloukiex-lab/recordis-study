@@ -15,10 +15,10 @@ Papers of record: [Comparing Processes as Curves of Distributions (underlying di
 | Status | Count | Meaning |
 |---|---:|---|
 | Active | 3 | Survives the controls it was tested against. |
-| Negative | 2 | Tested and did not hold. |
-| **Total** | **5** | |
+| Negative | 3 | Tested and did not hold. |
+| **Total** | **6** | |
 
-**2 negative results and 0 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
+**3 negative results and 0 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
 
 ## Confidence rungs
 
@@ -63,6 +63,8 @@ Findings 1 and 3 are negative results.
 
 ### Negative
 
+- **[6] Replication on an independent database: holds for 11 of 12 patients, fails below chance for one** — rung 4, 2026-08-05  
+  The finding 5 protocol was repeated without modification on the Long Term AF Database — different patients, different recordings, longer durations, 128 Hz rather than 250 Hz. Mean accuracy across 12 patients was 0.893, below the pre-registered replication threshold of 0.90, and the criterion is recorded as failed. The mean is not representative of the distribution: 11 of the 12 patients scored between 0.660 and 1.000 with a mean of 0.942, and a single patient scored 0.350 — below the 0.500 chance level for a two-class problem, indicating a systematic rather than random failure for that recording. Onset latency replicated without qualification: median 0 windows across the episodes measured.
 - **[3] Comparison to published detectors, and to a population reference store, at equal store size** — rung 3, 2026-08-05  
   Neither pre-registered comparison was met. Published interval-based AF detectors report 95–98% accuracy on this database; the untuned method reached 93.5%. With store size held equal, a store composed of the patient's own windows exceeded a store composed of other patients' windows by 2.7 points accuracy and 3.7 points specificity across ten patients, against 10-point thresholds.
 - **[1] Single-beat morphology: classification does not reach the pre-registered threshold** — rung 3, 2026-08-05  
