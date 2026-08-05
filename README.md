@@ -15,11 +15,11 @@ Papers of record: [Comparing Processes as Curves of Distributions (underlying di
 | Status | Count | Meaning |
 |---|---:|---|
 | Active | 5 | Survives the controls it was tested against. |
-| Negative | 3 | Tested and did not hold. |
+| Negative | 4 | Tested and did not hold. |
 | Retracted | 1 | Subsequently refuted by our own measurement; original wording retained. |
-| **Total** | **9** | |
+| **Total** | **11** | |
 
-**3 negative results and 1 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
+**4 negative results and 1 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
 
 ## Confidence rungs
 
@@ -55,8 +55,8 @@ Findings 1 and 3 are negative results.
 
 ### Active
 
-- **[9] The failures are physiological, not algorithmic: in those patients the non-AF rhythm is itself irregular** — rung 3, 2026-08-05  
-  The patients on which classification fails are those whose two rhythm states do not differ in beat-to-beat variability. Median RMSSD for the non-AF and AF states, and their ratio, across the three lowest- and three highest-scoring patients of finding 7: patient 103, 282 ms non-AF against 109 ms AF (ratio 0.39, score 0.510); patient 11, 240 against 213 (0.89, 0.440); patient 10, 132 against 165 (1.25, 0.560); patient 110, 64 against 186 (2.89, 0.990); patient 00, 15 against 95 (6.50, 1.000); patient 102, 13 against 166 (12.42, 1.000). Every patient with a ratio above 2.8 scored at or above 0.990, and every patient below 1.3 scored at or below 0.560, with no overlap between the groups.
+- **[11] The information is present and the method discards it: a single-number detector separates the patient the method classifies at chance** `[clinical-rhythm]` — rung 3, 2026-08-05  
+  On patient 103, which finding 7 classified at 0.510 balanced accuracy and finding 9 attributed to an absence of separable signal, single-number detectors computed from beat timing alone separate the two rhythm states almost completely. Threshold-free AUC over that patient's pure-label windows: mean interval 0.026, RMSSD 0.070, median absolute successive difference 0.089 — all far from chance in the inverted direction, corresponding to separability of approximately 0.97, 0.93 and 0.91. The method, given the same windows and 64 stored examples of each of that patient's own states, assigns 96 percent of its non-AF windows to AF. Patients 10 and 11 also carry above-chance per-window information, with best absolute deviations from chance of 0.256 and 0.170, so the claim of absent signal does not hold for them either, though the margin is much smaller.
 - **[8] Diagnosis of the worst-performing patient: the representation does not separate that patient's two rhythms** — rung 3, 2026-08-05  
   For the patient scoring lowest in finding 7, the representation does not distinguish the two rhythm states at all. Mean distance between windows of opposite class is SMALLER than between windows of the same class (22.64 against 23.34, separation −0.70). A classifier retrieving by that distance is therefore reading noise for this patient, and its output is not merely unreliable but uninformative. Two candidate explanations are excluded: the store and query sets were class-balanced by construction, and accuracy differs little between queries near and far in time from their nearest stored window (0.380 against 0.320), so neither class imbalance nor within-recording drift accounts for it.
 - **[5] Continuous recording with no exclusions: 0.966 accuracy; AF onset detected in the first window of every episode** — rung 3, 2026-08-05  
@@ -68,6 +68,8 @@ Findings 1 and 3 are negative results.
 
 ### Negative
 
+- **[10] The representation's fixed bins are not the cause: per-patient adaptive binning does not rescue the failing patients** `[clinical-rhythm]` — rung 3, 2026-08-05  
+  The hypothesis that the failures of finding 7 are caused by the encoder — which clips successive interval differences at plus or minus 0.4 seconds and bins them with edges fixed across all patients, so that a highly variable patient could saturate the outermost bins and have both states encode alike — is refuted. Across 12 patients, balanced accuracy is 0.820 with the fixed encoder, 0.825 with equal-width bins set to the patient's own 99th percentile, and 0.830 with equal-mass bins at the patient's own quantiles. Patient 103, the patient the hypothesis was constructed to explain, is unchanged: 0.510 fixed, 0.510 scaled, 0.530 quantile.
 - **[7] Replication, restated with balanced query sets: 0.820 mean balanced accuracy, below the first database** — rung 4, 2026-08-05  
   Repeating the replication with class-balanced query sets, correcting the defect that retracted finding 6: mean balanced accuracy across the same 12 patients is 0.820, against a pre-registered replication threshold of 0.90 and against 0.966 on the first database. The criterion fails, and the corrected figure is lower than the flawed one it replaces. Per-patient balanced accuracy: 1.000, 1.000, 0.990, 0.980, 0.950, 0.920, 0.890, 0.880, 0.720, 0.560, 0.510, 0.440. Onset latency replicates without qualification: median 0 windows over 14 episodes.
 - **[3] Comparison to published detectors, and to a population reference store, at equal store size** — rung 3, 2026-08-05  
