@@ -115,8 +115,10 @@
       "id": 6,
       "date": "2026-08-05",
       "title": "Replication on an independent database: holds for 11 of 12 patients, fails below chance for one",
-      "status": "negative",
+      "status": "retracted",
       "rung": 4,
+      "retraction": "The per-patient figures in this finding are not accuracy. The query sets were taken in recording order, and this database contains long uninterrupted rhythm blocks, so for most patients every queried window carried the same label. A subsequent audit of both databases under the published protocol found single-class query sets for 42 of 56 evaluable patients here — and, separately, for 0 of 9 patients in the first database, so finding 5 is unaffected. Where a query set holds one class, the reported figure is that class's recall alone and carries no information about the other class. Restated with class-balanced query sets in finding 7, where the replication figure falls from 0.893 to 0.820. The original wording is retained below.",
+      "superseded_by": 7,
       "claim": "The finding 5 protocol was repeated without modification on the Long Term AF Database — different patients, different recordings, longer durations, 128 Hz rather than 250 Hz. Mean accuracy across 12 patients was 0.893, below the pre-registered replication threshold of 0.90, and the criterion is recorded as failed. The mean is not representative of the distribution: 11 of the 12 patients scored between 0.660 and 1.000 with a mean of 0.942, and a single patient scored 0.350 — below the 0.500 chance level for a two-class problem, indicating a systematic rather than random failure for that recording. Onset latency replicated without qualification: median 0 windows across the episodes measured.",
       "evidence": "Per-patient accuracy: 1.000, 1.000, 1.000, 1.000, 0.990, 0.990, 0.970, 0.900, 0.850, 0.660, 0.350 and 1.000. Up to 100 windows per patient in recording order with no exclusions, stores of 64 pure windows per state, and the representation, window length, store size and decision rule fixed on the first database with no adjustment for this one. Transition windows were classified at 0.931 against 0.893 for pure windows, the reverse of the ordering observed on the first database.",
       "scope": "Twelve patients from one additional database; the database contains 84 records, so this is a subset and not the full set. Within-patient only. The below-chance patient has not yet been diagnosed, so whether it reflects a data property, a labelling property, or a failure mode of the method is unknown.",
@@ -127,6 +129,41 @@
         "per-patient accuracy reported in full rather than as a mean, which is what makes the single failure visible"
       ],
       "note": "A below-chance result on a two-class problem is more informative than a merely poor one: it indicates the classifier is systematically inverted for that recording rather than uninformed. Identifying its cause is the next measurement, and until it is identified the possibility that the same failure mode is present and undetected in other patients cannot be excluded. The pre-registered criterion failed and is recorded as failed; reporting the 11-patient mean of 0.942 as the result would be selecting the sample after seeing it."
+    },
+    {
+      "id": 7,
+      "date": "2026-08-05",
+      "title": "Replication, restated with balanced query sets: 0.820 mean balanced accuracy, below the first database",
+      "status": "negative",
+      "rung": 4,
+      "supersedes": 6,
+      "claim": "Repeating the replication with class-balanced query sets, correcting the defect that retracted finding 6: mean balanced accuracy across the same 12 patients is 0.820, against a pre-registered replication threshold of 0.90 and against 0.966 on the first database. The criterion fails, and the corrected figure is lower than the flawed one it replaces. Per-patient balanced accuracy: 1.000, 1.000, 0.990, 0.980, 0.950, 0.920, 0.890, 0.880, 0.720, 0.560, 0.510, 0.440. Onset latency replicates without qualification: median 0 windows over 14 episodes.",
+      "evidence": "Queries drawn equally from both classes, in recording order within each class, up to 100 per patient; balanced accuracy is the mean of the two class recalls and does not move with the query mix. Stores of 64 pure windows per state; representation, window length, store size and decision rule unchanged from the first database. Two distinct failure modes are visible in the per-class recalls: patient 103 classifies almost everything as AF (non-AF recall 0.040, AF recall 0.980), while patient 11 is close to inverted in both directions (0.560 and 0.320).",
+      "scope": "Twelve patients from one additional database of 84 records; within-patient only; single seed. Balanced accuracy is reported because the class mix varies by patient and raw accuracy is not comparable across them.",
+      "code": "validate/afib_replication_ltafdb.py",
+      "controls": [
+        "class-balanced query sets, the absence of which invalidated finding 6",
+        "balanced accuracy reported rather than raw accuracy, so that a patient with a skewed rhythm mix cannot inflate or deflate the figure",
+        "per-class recall reported for every patient, which is what makes the two distinct failure modes visible",
+        "no parameter adjusted for this database"
+      ],
+      "note": "The method does not replicate on this database at the level measured on the first one. That is the finding. Three patients fall at or below 0.560, and the mechanism differs between them, so a single explanation should not be assumed. Finding 8 reports the diagnosis for one of them. The audit that produced this correction is itself a result: a protocol can pass on one database and be invalid on another purely because of how the rhythm is distributed within recordings, and the check for that is cheap and was not run until a below-chance figure forced it."
+    },
+    {
+      "id": 8,
+      "date": "2026-08-05",
+      "title": "Diagnosis of the worst-performing patient: the representation does not separate that patient's two rhythms",
+      "status": "active",
+      "rung": 3,
+      "claim": "For the patient scoring lowest in finding 7, the representation does not distinguish the two rhythm states at all. Mean distance between windows of opposite class is SMALLER than between windows of the same class (22.64 against 23.34, separation −0.70). A classifier retrieving by that distance is therefore reading noise for this patient, and its output is not merely unreliable but uninformative. Two candidate explanations are excluded: the store and query sets were class-balanced by construction, and accuracy differs little between queries near and far in time from their nearest stored window (0.380 against 0.320), so neither class imbalance nor within-recording drift accounts for it.",
+      "evidence": "Within-class mean distance computed over 12 stored windows per class, between-class over all cross-class pairs. Label structure of the recording was also examined and does not explain the result: the recording is 65.7% AF with only 3 rhythm changes and no AF run shorter than one analysis window, so the labels are neither sparse nor fragmented.",
+      "scope": "One patient. Whether negative separation occurs in the other low-scoring patients, and whether it can be predicted from the recording before classification is attempted, is not yet measured.",
+      "code": "validate/diagnose_patient11.py",
+      "controls": [
+        "class balance and temporal drift tested as alternative explanations before separation was concluded",
+        "label structure inspected directly rather than assumed adequate"
+      ],
+      "note": "This is a per-patient failure of the representation rather than of the retrieval procedure or the store. It suggests a usable safeguard: separation between the stored classes can be measured at enrolment, before any classification is attempted, and a patient whose classes do not separate can be identified as one the method cannot serve rather than issued unreliable output. Whether that check is predictive has not been tested and is not claimed."
     }
   ],
   "equations": {

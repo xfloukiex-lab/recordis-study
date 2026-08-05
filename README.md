@@ -14,11 +14,12 @@ Papers of record: [Comparing Processes as Curves of Distributions (underlying di
 
 | Status | Count | Meaning |
 |---|---:|---|
-| Active | 3 | Survives the controls it was tested against. |
+| Active | 4 | Survives the controls it was tested against. |
 | Negative | 3 | Tested and did not hold. |
-| **Total** | **6** | |
+| Retracted | 1 | Subsequently refuted by our own measurement; original wording retained. |
+| **Total** | **8** | |
 
-**3 negative results and 0 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
+**3 negative results and 1 retractions are in here on purpose.** A retraction keeps its original wording visible with the reason it was wrong next to it. `check.py` fails the build if a retraction carries no explanation — that would be a deletion, not a retraction.
 
 ## Confidence rungs
 
@@ -54,6 +55,8 @@ Findings 1 and 3 are negative results.
 
 ### Active
 
+- **[8] Diagnosis of the worst-performing patient: the representation does not separate that patient's two rhythms** — rung 3, 2026-08-05  
+  For the patient scoring lowest in finding 7, the representation does not distinguish the two rhythm states at all. Mean distance between windows of opposite class is SMALLER than between windows of the same class (22.64 against 23.34, separation −0.70). A classifier retrieving by that distance is therefore reading noise for this patient, and its output is not merely unreliable but uninformative. Two candidate explanations are excluded: the store and query sets were class-balanced by construction, and accuracy differs little between queries near and far in time from their nearest stored window (0.380 against 0.320), so neither class imbalance nor within-recording drift accounts for it.
 - **[5] Continuous recording with no exclusions: 0.966 accuracy; AF onset detected in the first window of every episode** — rung 3, 2026-08-05  
   Findings 2 and 4 excluded windows spanning a rhythm transition, which are the windows containing episode onset and offset. Scoring every window with no exclusions, mixed windows assigned by majority class, accuracy was 0.966 across nine patients. Transition windows were classified less accurately than pure windows (0.902 against 0.969) without moving the overall figure outside the published range. In 14 AF episodes of at least three windows, the first AF classification occurred in the first window of the episode in every case (median lag 0 windows, 90th percentile 0).
 - **[4] Accuracy is limited by store size, not by hyperparameters: 0.983 at 64 stored windows per state** — rung 3, 2026-08-05  
@@ -63,12 +66,18 @@ Findings 1 and 3 are negative results.
 
 ### Negative
 
-- **[6] Replication on an independent database: holds for 11 of 12 patients, fails below chance for one** — rung 4, 2026-08-05  
-  The finding 5 protocol was repeated without modification on the Long Term AF Database — different patients, different recordings, longer durations, 128 Hz rather than 250 Hz. Mean accuracy across 12 patients was 0.893, below the pre-registered replication threshold of 0.90, and the criterion is recorded as failed. The mean is not representative of the distribution: 11 of the 12 patients scored between 0.660 and 1.000 with a mean of 0.942, and a single patient scored 0.350 — below the 0.500 chance level for a two-class problem, indicating a systematic rather than random failure for that recording. Onset latency replicated without qualification: median 0 windows across the episodes measured.
+- **[7] Replication, restated with balanced query sets: 0.820 mean balanced accuracy, below the first database** — rung 4, 2026-08-05  
+  Repeating the replication with class-balanced query sets, correcting the defect that retracted finding 6: mean balanced accuracy across the same 12 patients is 0.820, against a pre-registered replication threshold of 0.90 and against 0.966 on the first database. The criterion fails, and the corrected figure is lower than the flawed one it replaces. Per-patient balanced accuracy: 1.000, 1.000, 0.990, 0.980, 0.950, 0.920, 0.890, 0.880, 0.720, 0.560, 0.510, 0.440. Onset latency replicates without qualification: median 0 windows over 14 episodes.
 - **[3] Comparison to published detectors, and to a population reference store, at equal store size** — rung 3, 2026-08-05  
   Neither pre-registered comparison was met. Published interval-based AF detectors report 95–98% accuracy on this database; the untuned method reached 93.5%. With store size held equal, a store composed of the patient's own windows exceeded a store composed of other patients' windows by 2.7 points accuracy and 3.7 points specificity across ten patients, against 10-point thresholds.
 - **[1] Single-beat morphology: classification does not reach the pre-registered threshold** — rung 3, 2026-08-05  
   Classification of individual heartbeats by waveform morphology (five rhythm classes, single patient, ECG5000) did not meet its pre-registered criteria. Recognition accuracy increased with the number of stored examples (0.370, 0.428, 0.517, 0.517 for stores of 1, 2, 4 and 8 examples per class; chance 0.200) but plateaued at approximately half the 0.85 threshold. Reconstruction accuracy did not increase across the same range (0.407, 0.450, 0.417, 0.467).
+
+### Retracted
+
+- **[6] Replication on an independent database: holds for 11 of 12 patients, fails below chance for one** — rung 4, 2026-08-05  
+  The finding 5 protocol was repeated without modification on the Long Term AF Database — different patients, different recordings, longer durations, 128 Hz rather than 250 Hz. Mean accuracy across 12 patients was 0.893, below the pre-registered replication threshold of 0.90, and the criterion is recorded as failed. The mean is not representative of the distribution: 11 of the 12 patients scored between 0.660 and 1.000 with a mean of 0.942, and a single patient scored 0.350 — below the 0.500 chance level for a two-class problem, indicating a systematic rather than random failure for that recording. Onset latency replicated without qualification: median 0 windows across the episodes measured.
+  *Why it was wrong:* The per-patient figures in this finding are not accuracy. The query sets were taken in recording order, and this database contains long uninterrupted rhythm blocks, so for most patients every queried window carried the same label. A subsequent audit of both databases under the published protocol found single-class query sets for 42 of 56 evaluable patients here — and, separately, for 0 of 9 patien
 
 ## Running it
 
