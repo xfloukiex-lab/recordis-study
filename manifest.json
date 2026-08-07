@@ -1,9 +1,9 @@
 {
-  "project": "Recordis",
+  "project": "Cordthym",
   "subtitle": "Per-patient cardiac rhythm classification from remembered episodes — study record",
   "one_line": "Atrial fibrillation is classified against a store of the individual patient's own labelled rhythm episodes, with each classification traceable to the episodes that produced it.",
   "byline": "Alexander Parnell · Vektorgeist · vektorgeist.com/research",
-  "study_url": "https://xfloukiex-lab.github.io/recordis-study/",
+  "study_url": "https://xfloukiex-lab.github.io/cordthym-study/",
   "papers": [
     {"title": "Comparing Processes as Curves of Distributions (underlying distance)", "doi": "10.5281/zenodo.21612829"},
     {"title": "Learning Without Weights (learning method)", "doi": "10.5281/zenodo.21612831"}

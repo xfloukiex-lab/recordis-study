@@ -1,6 +1,6 @@
-# Recordis — the study record
+# Cordthym — the study record
 
-**Live record:** https://xfloukiex-lab.github.io/recordis-study/
+**Live record:** https://xfloukiex-lab.github.io/cordthym-study/
 
 > Atrial fibrillation is classified against a store of the individual patient's own labelled rhythm episodes, with each classification traceable to the episodes that produced it.
 

@@ -1,4 +1,4 @@
-"""Build the Recordis clinical study record from manifest.json. LOCAL ONLY.
+"""Build the Cordthym clinical study record from manifest.json. LOCAL ONLY.
 
 The manifest is the single source of truth: every figure on the page, including the summary
 counts, is generated from it, so no hand-written figure can drift out of date.
