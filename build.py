@@ -352,7 +352,7 @@ def build():
      post-hoc and untested.</p>
 
   <h2>Regulatory status</h2>
-  <p>Research use only. This is not a medical device and is not intended for diagnosis or for any
+  <p>Not cleared or approved by any regulator. No clinical claim is made and this is not intended for diagnosis or for any
      clinical decision. No clinical claim is made anywhere in this record.</p>
 </section>
 
